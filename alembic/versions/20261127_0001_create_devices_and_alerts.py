@@ -39,7 +39,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index("ix_alerts_device_id", table_name="alerts")
+    # MySQL rejects dropping an index a foreign key relies on (error 1553); dropping the tables removes their indexes.
     op.drop_table("alerts")
-    op.drop_index("ix_devices_device_id", table_name="devices")
     op.drop_table("devices")

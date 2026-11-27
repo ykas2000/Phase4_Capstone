@@ -11,6 +11,8 @@ Minimal FastAPI device API. Device data is stored in memory and resets when the 
 
 See [docs/RUNBOOK.md](docs/RUNBOOK.md) for full setup, scenario checks, and troubleshooting.
 
+See [docs/PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) for the project description and a step-by-step walkthrough with execution screenshots.
+
 
 
 

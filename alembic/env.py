@@ -1,9 +1,14 @@
+from logging.config import fileConfig
+
 from alembic import context
 from sqlalchemy import create_engine, pool
 
 from app.config import DATABASE_URL
 from app.db.models import Base
 
+
+if context.config.config_file_name is not None:
+    fileConfig(context.config.config_file_name, disable_existing_loggers=False)
 
 target_metadata = Base.metadata
 
