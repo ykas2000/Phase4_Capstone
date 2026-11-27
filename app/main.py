@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 
 from app.repositories.device_repository import InMemoryDeviceRepository
@@ -7,11 +9,15 @@ from app.routes.health import router as health_router
 from app.services.device_service import DeviceService
 
 
-def create_app() -> FastAPI:
+def create_app(storage: str | None = None) -> FastAPI:
     app = FastAPI(title="NetPulse API")
-    device_repository = InMemoryDeviceRepository()
-    app.state.device_repository = device_repository
-    app.state.device_service = DeviceService(device_repository)
+    app.state.storage = storage or os.getenv("NETPULSE_STORAGE", "memory").lower()
+    if app.state.storage not in {"memory", "mysql"}:
+        raise ValueError("NETPULSE_STORAGE must be 'memory' or 'mysql'")
+    if app.state.storage == "memory":
+        device_repository = InMemoryDeviceRepository()
+        app.state.device_repository = device_repository
+        app.state.device_service = DeviceService(device_repository)
     app.include_router(devices_router)
     app.include_router(alerts_router)
     app.include_router(health_router)

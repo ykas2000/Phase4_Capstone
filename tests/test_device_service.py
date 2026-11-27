@@ -1,5 +1,4 @@
 from datetime import timezone
-from uuid import uuid4
 
 import pytest
 
@@ -38,7 +37,7 @@ def test_register_rejects_duplicate_id(
     service_context: tuple[InMemoryDeviceRepository, DeviceService],
 ) -> None:
     _, service = service_context
-    device_id = uuid4()
+    device_id = "RTR-101"
     payload = DeviceCreate(
         device_id=device_id,
         name="router",
@@ -51,6 +50,9 @@ def test_register_rejects_duplicate_id(
     with pytest.raises(DeviceAlreadyExistsError):
         service.register(payload)
 
+    assert service.get(device_id).name == "router"
+    assert len(service.list()) == 1
+
 
 def test_missing_device_raises_not_found(
     service_context: tuple[InMemoryDeviceRepository, DeviceService],
@@ -58,7 +60,14 @@ def test_missing_device_raises_not_found(
     _, service = service_context
 
     with pytest.raises(DeviceNotFoundError):
-        service.get(uuid4())
+        service.get("MISSING-1")
+
+
+def test_device_id_rejects_invalid_characters() -> None:
+    with pytest.raises(ValueError):
+        DeviceCreate(
+            device_id="RTR 101/../", name="router", device_type="router", ip_address="192.168.1.1"
+        )
 
 
 def test_offline_alert_only_fires_on_online_to_offline(
@@ -90,3 +99,7 @@ def test_offline_alert_only_fires_on_online_to_offline(
 
     assert repository.list_alerts() == alerts
     assert service.get(offline_device.device_id).status == "offline"
+
+    service.update_status(online_device.device_id, StatusUpdate(status="online"))
+    service.update_status(online_device.device_id, StatusUpdate(status="offline"))
+    assert len(repository.list_alerts()) == 2

@@ -1,13 +1,14 @@
 import ipaddress
 from datetime import datetime, timezone
 from typing import Literal
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 DeviceType = Literal["router", "switch", "server"]
 DeviceStatus = Literal["online", "offline"]
+DEVICE_ID_PATTERN = r"^[A-Za-z0-9_-]+$"
 
 
 class DeviceCreate(BaseModel):
@@ -15,7 +16,7 @@ class DeviceCreate(BaseModel):
         json_schema_extra={
             "examples": [
                 {
-                    "device_id": "123e4567-e89b-12d3-a456-426614174000",
+                    "device_id": "RTR-101",
                     "name": "Core router",
                     "device_type": "router",
                     "ip_address": "192.168.1.1",
@@ -25,7 +26,12 @@ class DeviceCreate(BaseModel):
         }
     )
 
-    device_id: UUID = Field(default_factory=uuid4)
+    device_id: str = Field(
+        default_factory=lambda: str(uuid4()),
+        min_length=1,
+        max_length=50,
+        pattern=DEVICE_ID_PATTERN,
+    )
     name: str = Field(min_length=1, max_length=100)
     device_type: DeviceType
     ip_address: str
@@ -54,7 +60,7 @@ class StatusUpdate(BaseModel):
 
 
 class AlertResponse(BaseModel):
-    device_id: UUID
+    device_id: str
     message: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

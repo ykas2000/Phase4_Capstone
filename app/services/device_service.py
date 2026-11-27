@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from app.events import create_offline_alert
 from app.models import DeviceCreate, DeviceResponse, StatusUpdate
 from app.repositories.device_repository import InMemoryDeviceRepository
@@ -25,13 +23,13 @@ class DeviceService:
     def list(self) -> list[DeviceResponse]:
         return self._repository.list_devices()
 
-    def get(self, device_id: UUID) -> DeviceResponse:
+    def get(self, device_id: str) -> DeviceResponse:
         device = self._repository.get_device(device_id)
         if device is None:
             raise DeviceNotFoundError(device_id)
         return device
 
-    def update_status(self, device_id: UUID, update: StatusUpdate) -> DeviceResponse:
+    def update_status(self, device_id: str, update: StatusUpdate) -> DeviceResponse:
         device = self._repository.get_device(device_id)
         if device is None:
             raise DeviceNotFoundError(device_id)
@@ -44,7 +42,7 @@ class DeviceService:
             create_offline_alert(self._repository, device_id)
         return updated_device
 
-    def delete_device(self, device_id: UUID) -> None:
+    def delete_device(self, device_id: str) -> None:
         device = self._repository.delete_device(device_id)
         if device is None:
             raise DeviceNotFoundError(device_id)

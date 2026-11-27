@@ -1,12 +1,11 @@
 from typing import Dict, List, Optional
-from uuid import UUID
 
 from app.models import AlertResponse, DeviceCreate, DeviceResponse, StatusUpdate
 
 
 class InMemoryDeviceRepository:
     def __init__(self) -> None:
-        self._devices: Dict[UUID, DeviceResponse] = {}
+        self._devices: Dict[str, DeviceResponse] = {}
         self._alerts: List[AlertResponse] = []
 
     def add_device(self, payload: DeviceCreate) -> DeviceResponse:
@@ -17,12 +16,12 @@ class InMemoryDeviceRepository:
     def list_devices(self) -> List[DeviceResponse]:
         return [device.model_copy(deep=True) for device in self._devices.values()]
 
-    def get_device(self, device_id: UUID) -> Optional[DeviceResponse]:
+    def get_device(self, device_id: str) -> Optional[DeviceResponse]:
         device = self._devices.get(device_id)
         return device.model_copy(deep=True) if device is not None else None
 
     def update_status(
-        self, device_id: UUID, update: StatusUpdate
+        self, device_id: str, update: StatusUpdate
     ) -> Optional[DeviceResponse]:
         device = self._devices.get(device_id)
         if device is None:
@@ -38,6 +37,6 @@ class InMemoryDeviceRepository:
     def list_alerts(self) -> List[AlertResponse]:
         return [alert.model_copy(deep=True) for alert in self._alerts]
 
-    def delete_device(self, device_id: UUID) -> Optional[DeviceResponse]:
+    def delete_device(self, device_id: str) -> Optional[DeviceResponse]:
         device = self._devices.pop(device_id, None)
         return device.model_copy(deep=True) if device is not None else None

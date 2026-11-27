@@ -1,6 +1,5 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Callable, List
-from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -11,7 +10,7 @@ if TYPE_CHECKING:
 
 
 def create_offline_alert(
-    repository: "InMemoryDeviceRepository", device_id: UUID
+    repository: "InMemoryDeviceRepository", device_id: str
 ) -> None:
     alert = AlertResponse(
         device_id=device_id,
@@ -23,7 +22,7 @@ def create_offline_alert(
 
 class DeviceEvent(BaseModel):
     event_type: str
-    device_id: UUID
+    device_id: str
     occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
