@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app import __version__
 from app.config import get_settings
 from app.db.collections import ensure_indexes
 from app.db.mongo import close_client, get_db
@@ -24,7 +25,7 @@ async def lifespan(app: FastAPI):
         close_client()
 
 
-app = FastAPI(title="NetPulse", lifespan=lifespan)
+app = FastAPI(title="NetPulse", version=__version__, lifespan=lifespan)
 app.include_router(devices.router)
 app.include_router(alerts.router)
 app.include_router(health.router)
